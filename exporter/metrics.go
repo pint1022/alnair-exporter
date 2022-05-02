@@ -59,6 +59,26 @@ func AddMetrics() map[string]*prometheus.Desc {
 		[]string{}, nil,
 	)
 
+	APIMetrics["BurstSize"] = prometheus.NewDesc(
+		prometheus.BuildFQName("GPU", "kernel", "burst"),
+		"The elapse time (milliseconds)at which the current kernel runs on GPU.",
+		[]string{"pod", "kernel"}, nil,
+	)	
+	APIMetrics["Overuse"] = prometheus.NewDesc(
+		prometheus.BuildFQName("GPU", "kernel", "overuse"),
+		"The elapse time (milliseconds)at which the current kernel runs overtime on GPU.",
+		[]string{"pod", "kernel"}, nil,
+	)	
+	APIMetrics["MemH2D"] = prometheus.NewDesc(
+		prometheus.BuildFQName("GPU", "kernel", "H2D"),
+		"The elapse time (milliseconds)at which the current pod memory copy (H2D) on GPU.",
+		[]string{"pod", "kernel"}, nil,
+	)	
+	APIMetrics["MemD2H"] = prometheus.NewDesc(
+		prometheus.BuildFQName("GPU", "kernel", "D2H"),
+		"The elapse time (milliseconds)at which the current pod memory copy(D2H) on GPU.",
+		[]string{"pod", "kernel"}, nil,
+	)	
 	return APIMetrics
 }
 
@@ -92,6 +112,18 @@ func (e *Exporter) processMetrics(data []*Datum, rates *RateLimits, ch chan<- pr
 	ch <- prometheus.MustNewConstMetric(e.APIMetrics["Limit"], prometheus.GaugeValue, rates.Limit)
 	ch <- prometheus.MustNewConstMetric(e.APIMetrics["Remaining"], prometheus.GaugeValue, rates.Remaining)
 	ch <- prometheus.MustNewConstMetric(e.APIMetrics["Reset"], prometheus.GaugeValue, rates.Reset)
+
+	return nil
+}
+
+// processGPUmetrics - processes the response GPU metrics using it as a source
+func (e *Exporter) processGPUMetrics( data *GPUMetrics, ch chan<- prometheus.Metric) error {
+
+	// Set Rate limit stats
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["BurstSize"], prometheus.GaugeValue, data.burst)
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["Overuse"], prometheus.GaugeValue, data.overuse)
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["MemH2D"], prometheus.GaugeValue, data.MemH2D)
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["MemD2H"], prometheus.GaugeValue, data.MemD2H)
 
 	return nil
 }

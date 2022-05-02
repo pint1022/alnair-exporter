@@ -2,6 +2,7 @@ package exporter
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/infinityworks/github-exporter/config"
 	"github.com/prometheus/client_golang/prometheus"
@@ -74,4 +75,26 @@ type Response struct {
 	response *http.Response
 	body     []byte
 	err      error
+}
+
+// RateLimits is used to store rate limit data into a struct
+// This data is later represented as a metric, captured at the end of a scrape
+type GPUMetrics struct {
+	burst    	int64
+	overuse   	int64
+	windowsize 	int64
+	MemH2D    	int64
+	MemD2H    	int64
+}
+type comm_request_t int32
+const (
+   REQ_QUOTA comm_request_t = 0
+   REQ_MEM_LIMIT = 1
+   REQ_MEM_UPDATE = 2
+   REQ_SAMPLE = 3
+) 
+
+type UnpackedSample struct {
+    First  uint32
+    sample string
 }

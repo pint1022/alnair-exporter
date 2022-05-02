@@ -21,13 +21,13 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	data := []*Datum{}
 	var err error
 	// Scrape the Data from Github
-	if len(e.TargetURLs()) > 0 {
-		data, err = e.gatherData()
-		if err != nil {
-			log.Errorf("Error gathering Data from remote API: %v", err)
-			return
-		}
-	}
+	// if len(e.TargetURLs()) > 0 {
+	// 	data, err = e.gatherData()
+	// 	if err != nil {
+	// 		log.Errorf("Error gathering Data from remote API: %v", err)
+	// 		return
+	// 	}
+	// }
 
 	rates, err := e.getRates()
 	if err != nil {
@@ -43,6 +43,22 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
+
+	// GPUmet := []*GPUMetrics{}
+
+	GPUmet, err := e.getGPUMetrics()
+	if err != nil {
+		log.Errorf("Error gathering GPU metrics from remote API: %v", err)
+		return
+	}
+
+	// Set prometheus gauge metrics using the data gathered
+	err = e.processGPUMetrics(GPUmet, ch)
+
+	if err != nil {
+		log.Error("Error Processing Metrics", err)
+		return
+	}
 	log.Info("All Metrics successfully collected")
 
 }

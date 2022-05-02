@@ -22,6 +22,9 @@ type Config struct {
 	users         []string
 	apiToken      string
 	targetURLs    []string
+	sampleRate    string
+	schedulerIP   string
+	schedulerPort string
 }
 
 // Init populates the Config struct based on environmental runtime configuration
@@ -39,6 +42,9 @@ func Init() Config {
 		nil,
 		"",
 		nil,
+		"1000",
+		"127.0.0.1",
+		"50051",
 	}
 
 	err := appConfig.SetAPIURL(cfg.GetEnv("API_URL", "https://api.github.com"))
@@ -67,6 +73,21 @@ func Init() Config {
 			log.Errorf("Error initialising Configuration, Error: %v", err)
 		}
 	}
+
+	sampleRate := os.Getenv("SAMPLE_RATE");
+	if (sampleRate != "") {
+	  appConfig.SetSampleRate(sampleRate);
+	}
+  
+	schedulerIP := os.Getenv("SCHEDULER_IP");
+	if (schedulerIP != "") {
+	  appConfig.SetSchedulerIP(schedulerIP);
+	}
+  
+	schedulerPort := os.Getenv("SCHEDULER_PORT");
+	if (schedulerIP != "") {
+	  appConfig.SetSchedulerPort(schedulerPort);
+	}  
 
 	return appConfig
 }
@@ -182,4 +203,34 @@ func (c *Config) setScrapeURLs() error {
 	c.targetURLs = urls
 
 	return nil
+}
+
+// SetSampleRate accepts a string of sampling rate
+func (c *Config) SetSampleRate(token string) {
+	c.sampleRate = token
+}
+
+// Returns the sample rate for sampling
+func (c *Config) SampleRate() string {
+	return c.sampleRate
+}
+
+// SetSchedulerIP accepts a string of scheduler IP
+func (c *Config) SetSchedulerIP(token string) {
+	c.schedulerIP = token
+}
+
+// Returns scheduler IP address
+func (c *Config) SchedulerIP() string {
+	return c.schedulerIP
+}
+
+// SetSchedulerPort accepts a string of scheduler Port
+func (c *Config) SetSchedulerPort(token string) {
+	c.schedulerPort = token
+}
+
+// Returns scheduler port
+func (c *Config) SchedulerPort() string {
+	return c.schedulerPort
 }
