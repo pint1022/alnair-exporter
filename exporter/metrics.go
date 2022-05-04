@@ -120,10 +120,10 @@ func (e *Exporter) processMetrics(data []*Datum, rates *RateLimits, ch chan<- pr
 func (e *Exporter) processGPUMetrics( data *GPUMetrics, ch chan<- prometheus.Metric) error {
 
 	// Set Rate limit stats
-	ch <- prometheus.MustNewConstMetric(e.APIMetrics["BurstSize"], prometheus.GaugeValue, data.burst)
-	ch <- prometheus.MustNewConstMetric(e.APIMetrics["Overuse"], prometheus.GaugeValue, data.overuse)
-	ch <- prometheus.MustNewConstMetric(e.APIMetrics["MemH2D"], prometheus.GaugeValue, data.MemH2D)
-	ch <- prometheus.MustNewConstMetric(e.APIMetrics["MemD2H"], prometheus.GaugeValue, data.MemD2H)
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["BurstSize"], prometheus.GaugeValue, float64(data.burst))
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["Overuse"], prometheus.GaugeValue, float64(data.overuse))
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["MemH2D"], prometheus.GaugeValue, float64(data.MemH2D))
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["MemD2H"], prometheus.GaugeValue, float64(data.MemD2H))
 
 	return nil
 }

@@ -44,16 +44,15 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	}
 
 
-	// GPUmet := []*GPUMetrics{}
 
-	GPUmet, err := e.getGPUMetrics()
-	if err != nil {
+	GPUdata, rc := e.getGPUMetrics()
+	if rc != 0 {
 		log.Errorf("Error gathering GPU metrics from remote API: %v", err)
 		return
 	}
 
 	// Set prometheus gauge metrics using the data gathered
-	err = e.processGPUMetrics(GPUmet, ch)
+	err = e.processGPUMetrics(GPUdata, ch)
 
 	if err != nil {
 		log.Error("Error Processing Metrics", err)

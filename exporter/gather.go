@@ -2,7 +2,6 @@ package exporter
 
 import (
 	"encoding/json"
-	"os"
 	"fmt"
 	"path"
 	"strconv"
@@ -140,16 +139,18 @@ func isArray(body []byte) bool {
 }
 
   
-func (e *Exporter) getGPUMetrics(CONNECT string, data *GPUMetrics) (string) {
+func (e *Exporter) getGPUMetrics() (*GPUMetrics, int) {
 
-	rc, sample := e.communicate(CONNECT, REQ_SAMPLE)
+	CONNECT := e.SchedulerIP() + ":" + e.SchedulerPort()
+	sample, rc := e.communicate(CONNECT, REQ_SAMPLE)
 	if rc != 0 {
 		err := "failed to retrieve sampling data."
 		log.Errorf(err)
-		return err
+		return &GPUMetrics {}, rc
 	}
 	
+	data := GPUMetrics {}
 	json.Unmarshal(sample, &data)
 
-	return ""
+	return &data, rc
 }

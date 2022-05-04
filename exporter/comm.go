@@ -70,7 +70,7 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) ([]byte,
 		NET_OP_MAX_ATTEMPT, NET_OP_RETRY_INTV)
   
 	if rc == 0 {
-		sample := e.parse_response(resp)
+		sample = e.parse_response(resp)
 	}
 
 	return sample, rc
@@ -91,7 +91,7 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) ([]byte,
 // Attempt a function several times. Non-zero return of func is treated as an error. If func return
 // -1, errno will be returned.
 
-func (e *Exporter) prepare_request(reqType comm_request_t) []byte  {
+func (e *Exporter) prepare_request(reqType comm_request_t) []byte {
 
 	id := 0
 	pod_name := os.Getenv("POD_NAME")
@@ -105,11 +105,11 @@ func (e *Exporter) prepare_request(reqType comm_request_t) []byte  {
 	// buf := fmt.Sprintf("%d%s\000%d%d", client_name_len, client_name, id, reqType)
  
 	buf := new(bytes.Buffer)
-	err := binary.Write(buf, binary.BigEndian, req)
+	err := binary.Write(buf, binary.LittleEndian, req)
 	if err != nil {
 		log.Errorf("Unable to create the request, Error: %s", err)
 		return []byte("")
 	}
 
-	return buf.Array()
+	return buf.Bytes()
   }
