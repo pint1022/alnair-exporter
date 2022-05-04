@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"os"
 	"fmt"
-	"net"
 	"path"
 	"strconv"
 	"strings"
-    "encoding/binary"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -141,47 +139,17 @@ func isArray(body []byte) bool {
 
 }
 
-func (e *Exporter) parse_response(buf string) string{
-    var unpacked UnpackedSample
-
-    err := binary.Read(input, binary.LittleEndian, &unpacked)
-    
-	return unpacked.sample;
-  }
-// Attempt a function several times. Non-zero return of func is treated as an error. If func return
-// -1, errno will be returned.
-
-func (e *Exporter) prepare_request(comm_request_t type)  {
-
-	id := 0
-	client_name := os.Getenv("POD_NAME");
-	if (client_name == "") {
-		client_name, err := os.Hostname()		
-	}
-	client_name_len := strlen(client_name);
-
   
-	buf := fmt.Sprintf("%d%s\0%d%d", client_name_len, client_name,id, type)
-  
-	return buf;
-  }
-  
-func (e *Exporter) getGPUMetrics(CONNECT string, *[]GPUMetrics) (error) {
+func (e *Exporter) getGPUMetrics(CONNECT string, data *GPUMetrics) (string) {
 
-	req := e.prepare_request(REQ_SAMPLE) 
-
-	conn, err := net.Dial("tcp", CONNECT)
-	if err != nil {
-		log.Errorf("Unable to open tcp connection, Error: %s", err)
+	rc, sample := e.communicate(CONNECT, REQ_SAMPLE)
+	if rc != 0 {
+		err := "failed to retrieve sampling data."
+		log.Errorf(err)
 		return err
 	}
-	rc = communicate(conn, req, &resp, NET_OP_RETRY_INTV);
-	if (rc != 0) {
-		err := "failed to retrieve sampling data."
-		log.Errorf(err);
-		return {}
-	}
-	sample := e.parse_response(resp);
-	json.Unmarshal(resp, &data)
-	return sample
+	
+	json.Unmarshal(sample, &data)
+
+	return ""
 }

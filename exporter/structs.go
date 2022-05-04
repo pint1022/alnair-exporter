@@ -14,6 +14,8 @@ import (
 type Exporter struct {
 	APIMetrics map[string]*prometheus.Desc
 	config.Config
+	mu sync.Mutex
+
 }
 
 // Data is used to store an array of Datums.
@@ -96,5 +98,12 @@ const (
 
 type UnpackedSample struct {
     First  uint32
-    sample string
+    sample []byte
+}
+
+type Packet struct {
+    len     int
+    msg     string
+    reqId   int
+    reqType comm_request_t
 }
