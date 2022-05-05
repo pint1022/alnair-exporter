@@ -1,4 +1,4 @@
-module github.com/infinityworks/github-exporter
+module github.com/pint1022/alnair-exporter
 
 go 1.14
 

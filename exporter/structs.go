@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/infinityworks/github-exporter/config"
+	"github.com/pint1022/alnair-exporter/config"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
