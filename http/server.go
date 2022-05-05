@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/infinityworks/github-exporter/exporter"
+	"github.com/alnair-exporter/alnair-exporter/exporter"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
@@ -23,10 +23,10 @@ func NewServer(exporter exporter.Exporter) *Server {
 	r.Handle(exporter.MetricsPath(), promhttp.Handler())
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(`<html>
-		                <head><title>Github Exporter</title></head>
+		                <head><title>Alnair Exporter</title></head>
 		                <body>
 		                   <h1>GitHub Prometheus Metrics Exporter</h1>
-						   <p>For more information, visit <a href=https://github.com/infinityworks/github-exporter>GitHub</a></p>
+						   <p>For more information, visit <a href=https://github.com/alnair-exporter/alnair-exporter>GitHub</a></p>
 		                   <p><a href='` + exporter.MetricsPath() + `'>Metrics</a></p>
 		                   </body>
 		                </html>

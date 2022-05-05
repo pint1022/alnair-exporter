@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/infinityworks/github-exporter.svg?branch=master)](https://travis-ci.org/infinityworks/github-exporter)
+[![Build Status](https://travis-ci.org/pint1022/alnair-exporter.svg?branch=master)](https://travis-ci.org/pint1022/alnair-exporter)
 
 # Prometheus GitHub Exporter
 
@@ -24,26 +24,26 @@ the format "user1, user2".
 
 Run manually from Docker Hub:
 ```
-docker run -d --restart=always -p 9171:9171 -e REPOS="infinityworks/ranch-eye, infinityworks/prom-conf" infinityworks/github-exporter
+docker run -d --restart=always -p 9171:9171 -e REPOS="pint1022/Kubeshare pint1022/alnair-exporter" pint1022/alnair-exporter
 ```
 
 Build a docker image:
 ```
 docker build -t <image-name> .
-docker run -d --restart=always -p 9171:9171 -e REPOS="infinityworks/ranch-eye, infinityworks/prom-conf" <image-name>
+docker run -d --restart=always -p 9171:9171 -e REPOS="pint1022/Kubeshare, pint1022/alnair-exporter" <image-name>
 ```
 
 ## Docker compose
 
 ```
-github-exporter:
+alnair-exporter:
     tty: true
     stdin_open: true
     expose:
       - 9171
     ports:
       - 9171:9171
-    image: infinityworks/github-exporter:latest
+    image: pint1022/alnair-exporter:latest
     environment:
       - REPOS=<REPOS you want to monitor>
       - GITHUB_TOKEN=<your github api token>
@@ -74,4 +74,4 @@ Prior to running the following command ensure the number has been increased to d
 ```
 
 ## Metadata
-[![](https://images.microbadger.com/badges/image/infinityworks/github-exporter.svg)](http://microbadger.com/images/infinityworks/github-exporter "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/infinityworks/github-exporter.svg)](http://microbadger.com/images/infinityworks/github-exporter "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/pint1022/alnair-exporter.svg)](http://microbadger.com/images/pint1022/alnair-exporter "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/pint1022/alnair-exporter.svg)](http://microbadger.com/images/pint1022/alnair-exporter "Get your own version badge on microbadger.com")

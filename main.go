@@ -1,10 +1,10 @@
 package main
 
 import (
-	conf "github.com/infinityworks/github-exporter/config"
-	"github.com/infinityworks/github-exporter/exporter"
-	"github.com/infinityworks/github-exporter/http"
-	"github.com/infinityworks/go-common/logger"
+	conf "github.com/pint1022/alnair-exporter/config"
+	"github.com/pint1022/alnair-exporter/exporter"
+	"github.com/pint1022/alnair-exporter/http"
+	"github.com/pint1022/go-common/logger"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
@@ -22,7 +22,7 @@ func init() {
 }
 
 func main() {
-	log.Info("Starting Exporter")
+	log.Info("Starting Alnair Exporter")
 
 	exp := exporter.Exporter{
 		APIMetrics: mets,
