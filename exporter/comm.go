@@ -40,6 +40,7 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) ([]byte,
   
 	var sample []byte
 	req := e.prepare_request(reqType)
+	log.Info("req: %s", req)
 
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -94,10 +95,10 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) ([]byte,
 func (e *Exporter) prepare_request(reqType comm_request_t) []byte {
 
 	id := 0
-	pod_name := os.Getenv("POD_NAME")
+	pod_name := os.Getenv("ALNR_NAME")
 	if len(pod_name) == 0 {
-		log.Errorf("Fail to get pod name")
-		return []byte("")
+		// log.Errorf("Fail to get alnr name")
+		pod_name = "alnr"
 	}
 	req := Packet {len: len(pod_name), msg: pod_name, reqId: id, reqType: reqType}
 

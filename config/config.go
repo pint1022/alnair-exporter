@@ -23,8 +23,8 @@ type Config struct {
 	apiToken      string
 	targetURLs    []string
 	sampleRate    string
-	schedulerIP   string
-	schedulerPort string
+	alnrIP   string
+	alnrPort string
 }
 
 // Init populates the Config struct based on environmental runtime configuration
@@ -43,7 +43,7 @@ func Init() Config {
 		"",
 		nil,
 		"1000",
-		"127.0.0.1",
+		"0.0.0.0",
 		"60018",
 	}
 
@@ -79,14 +79,14 @@ func Init() Config {
 	  appConfig.SetSampleRate(sampleRate);
 	}
   
-	schedulerIP := os.Getenv("SCHEDULER_IP");
-	if (schedulerIP != "") {
-	  appConfig.SetSchedulerIP(schedulerIP);
+	alnrIP := os.Getenv("ALNR_IP");
+	if (alnrIP != "") {
+	  appConfig.SetAlnrIP(alnrIP);
 	}
   
-	schedulerPort := os.Getenv("SCHEDULER_PORT");
-	if (schedulerIP != "") {
-	  appConfig.SetSchedulerPort(schedulerPort);
+	alnrPort := os.Getenv("ALNR_PORT");
+	if (alnrIP != "") {
+	  appConfig.SetAlnrPort(alnrPort);
 	}  
 
 	return appConfig
@@ -216,21 +216,21 @@ func (c *Config) SampleRate() string {
 }
 
 // SetSchedulerIP accepts a string of scheduler IP
-func (c *Config) SetSchedulerIP(token string) {
-	c.schedulerIP = token
+func (c *Config) SetAlnrIP(token string) {
+	c.alnrIP = token
 }
 
 // Returns scheduler IP address
-func (c *Config) SchedulerIP() string {
-	return c.schedulerIP
+func (c *Config) AlnrIP() string {
+	return c.alnrIP
 }
 
 // SetSchedulerPort accepts a string of scheduler Port
-func (c *Config) SetSchedulerPort(token string) {
-	c.schedulerPort = token
+func (c *Config) SetAlnrPort(token string) {
+	c.alnrPort = token
 }
 
 // Returns scheduler port
-func (c *Config) SchedulerPort() string {
-	return c.schedulerPort
+func (c *Config) AlnrPort() string {
+	return c.alnrPort
 }

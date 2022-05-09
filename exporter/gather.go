@@ -141,7 +141,7 @@ func isArray(body []byte) bool {
   
 func (e *Exporter) getGPUMetrics() (*GPUMetrics, int) {
 
-	CONNECT := e.SchedulerIP() + ":" + e.SchedulerPort()
+	CONNECT := e.AlnrIP() + ":" + e.AlnrPort()
 	sample, rc := e.communicate(CONNECT, REQ_SAMPLE)
 	if rc != 0 {
 		err := "failed to retrieve sampling data."
