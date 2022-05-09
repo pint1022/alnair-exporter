@@ -10,7 +10,7 @@ import (
 
 	"os"
 
-	cfg "github.com/infinityworks/go-common/config"
+	cfg "github.com/pint1022/go-common/config"
 )
 
 // Config struct holds all of the runtime confgiguration for the application
@@ -44,7 +44,7 @@ func Init() Config {
 		nil,
 		"1000",
 		"127.0.0.1",
-		"50051",
+		"49901",
 	}
 
 	err := appConfig.SetAPIURL(cfg.GetEnv("API_URL", "https://api.github.com"))

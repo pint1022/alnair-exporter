@@ -4,7 +4,7 @@ import (
 	conf "github.com/pint1022/alnair-exporter/config"
 	"github.com/pint1022/alnair-exporter/exporter"
 	"github.com/pint1022/alnair-exporter/http"
-	"github.com/infinityworks/go-common/logger"
+	"github.com/pint1022/go-common/logger"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
@@ -22,7 +22,7 @@ func init() {
 }
 
 func main() {
-	log.Info("Starting Alnair Exporter")
+	log.Info("Starting Alnair (local) Exporter")
 
 	exp := exporter.Exporter{
 		APIMetrics: mets,
