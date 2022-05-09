@@ -44,7 +44,7 @@ func Init() Config {
 		nil,
 		"1000",
 		"127.0.0.1",
-		"49901",
+		"60018",
 	}
 
 	err := appConfig.SetAPIURL(cfg.GetEnv("API_URL", "https://api.github.com"))
