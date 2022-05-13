@@ -22,7 +22,7 @@ func init() {
 }
 
 func main() {
-	log.Info("Starting Alnair (local) Exporter")
+	log.Info("Starting Alnair (client) Exporter")
 
 	exp := exporter.Exporter{
 		APIMetrics: mets,

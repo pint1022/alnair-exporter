@@ -43,7 +43,7 @@ func Init() Config {
 		"",
 		nil,
 		"1000",
-		"127.0.0.1",
+		"alnr-exporter.kube-system.svc",
 		"60018",
 	}
 

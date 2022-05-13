@@ -41,7 +41,7 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) ([]byte,
   
 	var sample []byte
 	req := e.prepare_request(reqType)
-	log.Info("req: %s", req)
+	// log.Info("req: %s", req)
 
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -70,7 +70,9 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) ([]byte,
 		  return resp, 0;
 		},conn, req,
 		NET_OP_MAX_ATTEMPT, NET_OP_RETRY_INTV)
-  
+
+	log.Info("Resp: %s", resp)
+
 	if rc == 0 {
 		sample = e.parse_response(resp)
 	}
@@ -97,7 +99,7 @@ func (e *Exporter) prepare_request(r comm_request_t) []byte {
 
 	var id int32
 
-	pod_name := "alnair-exporter-nod\000"
+	pod_name := "alnair-client\000"
 	id = 0
 	var a [NAME_LEN]byte
 
@@ -107,8 +109,7 @@ func (e *Exporter) prepare_request(r comm_request_t) []byte {
     if err != nil {
         panic (err)
     }
-
-    fmt.Println(string(out))
+	log.Info("Req: ", string(out))
   
 	buf := new(bytes.Buffer)
 	err = binary.Write(buf, binary.LittleEndian, req)
@@ -117,7 +118,7 @@ func (e *Exporter) prepare_request(r comm_request_t) []byte {
 		log.Errorf("Unable to create the request, Error: %s", err)
 		return []byte("")
 	}
-    fmt.Println(buf.String())
+    // fmt.Println(buf.String())
 
 	return buf.Bytes()
   }

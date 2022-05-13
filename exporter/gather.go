@@ -143,6 +143,8 @@ func (e *Exporter) getGPUMetrics() (*GPUMetrics, int) {
 
 	CONNECT := e.AlnrIP() + ":" + e.AlnrPort()
 	sample, rc := e.communicate(CONNECT, REQ_SAMPLE)
+	log.Info("Alnair server address: %s", CONNECT)
+
 	if rc != 0 {
 		err := "failed to retrieve sampling data."
 		log.Errorf(err)
