@@ -79,7 +79,7 @@ func Init() Config {
 	  appConfig.SetSampleRate(sampleRate);
 	}
   
-	alnrIP := os.Getenv("ALNR_IP");
+	alnrIP := os.Getenv("EXPORTER_IP");
 	if (alnrIP != "") {
 	  appConfig.SetAlnrIP(alnrIP);
 	}

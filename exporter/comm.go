@@ -6,14 +6,15 @@ import (
 	"context"
 	"net"
 	"bytes"
-	"os"
+	"fmt"
     "encoding/binary"
-
+    "encoding/json"
 	log "github.com/sirupsen/logrus"
 )
 
 const NET_OP_MAX_ATTEMPT = 5  // maximum time retrying failed network operations
 const NET_OP_RETRY_INTV = 10  // seconds between two retries
+const NAME_LEN = 21  // seconds between two retries
 
 
 func multiple_attempt(f func(net.Conn, []byte) (string, int), conn net.Conn, req []byte, max_attempt int, interval int) ([]byte, int) {
@@ -92,25 +93,31 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) ([]byte,
 // Attempt a function several times. Non-zero return of func is treated as an error. If func return
 // -1, errno will be returned.
 
-func (e *Exporter) prepare_request(reqType comm_request_t) []byte {
+func (e *Exporter) prepare_request(r comm_request_t) []byte {
 
-	id := 0
-	pod_name := os.Getenv("ALNR_NAME")
-	if len(pod_name) == 0 {
-		// log.Errorf("Fail to get alnr name")
-		pod_name = "alnr"
-	}
-	req := Packet {len: len(pod_name), msg: pod_name, reqId: id, reqType: reqType}
+	var id int32
 
+	pod_name := "alnair-exporter-nod\000"
+	id = 0
+	var a [NAME_LEN]byte
+
+	copy(a[:], pod_name)	
+	req := Packet{Len:uint64(len(a) - 1), Msg:a, ReqId:id, ReqType:r}
+    out, err := json.Marshal(req)
+    if err != nil {
+        panic (err)
+    }
+
+    fmt.Println(string(out))
   
-	// buf := fmt.Sprintf("%d%s\000%d%d", client_name_len, client_name, id, reqType)
- 
 	buf := new(bytes.Buffer)
-	err := binary.Write(buf, binary.LittleEndian, req)
+	err = binary.Write(buf, binary.LittleEndian, req)
+
 	if err != nil {
 		log.Errorf("Unable to create the request, Error: %s", err)
 		return []byte("")
 	}
+    fmt.Println(buf.String())
 
 	return buf.Bytes()
   }

@@ -89,6 +89,7 @@ type GPUMetrics struct {
 	MemD2H    	int64
 }
 type comm_request_t int32
+
 const (
    REQ_QUOTA comm_request_t = 0
    REQ_MEM_LIMIT = 1
@@ -101,9 +102,10 @@ type UnpackedSample struct {
     sample []byte
 }
 
+
 type Packet struct {
-    len     int
-    msg     string
-    reqId   int
-    reqType comm_request_t
+    Len     uint64
+    Msg     [NAME_LEN]byte
+    ReqId   int32
+    ReqType comm_request_t
 }
