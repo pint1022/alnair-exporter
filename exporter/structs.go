@@ -95,10 +95,12 @@ const (
    REQ_MEM_LIMIT = 1
    REQ_MEM_UPDATE = 2
    REQ_SAMPLE = 3
+   SAM_MSG_LEN = 40
 ) 
 
 type UnpackedSample struct {
-    First  uint32
+    id  uint32
+	length int32
     sample []byte
 }
 

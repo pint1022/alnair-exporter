@@ -1,7 +1,7 @@
 package exporter
 
 import (
-	"bufio"
+	// "bufio"
 	"time"
 	"context"
 	"net"
@@ -17,13 +17,13 @@ const NET_OP_RETRY_INTV = 10  // seconds between two retries
 const NAME_LEN = 21  // seconds between two retries
 
 
-func multiple_attempt(f func(net.Conn, []byte) (string, int), conn net.Conn, req []byte, max_attempt int, interval int) ([]byte, int) {
+func multiple_attempt(f func(net.Conn, []byte) (int, []byte), conn net.Conn, req []byte, max_attempt int, interval int) (int,  []byte) {
 	var rc int
-	var resp string
+	var resp []byte
 
 	for attempt := 1; attempt <= max_attempt; attempt++ {
-	  resp, rc = f(conn, req);
-	  if (rc == 0) {
+	  rc, resp = f(conn, req);
+	  if (rc > 0) {
 		  break
 	  }
 	  log.Errorf("attempt %d", attempt)
@@ -31,11 +31,11 @@ func multiple_attempt(f func(net.Conn, []byte) (string, int), conn net.Conn, req
 		time.Sleep(time.Duration(interval) * time.Millisecond)
 	}
   }
-  return []byte(resp), rc
+  return rc, []byte(resp)
 
 }
 
-func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) ([]byte, int) {
+func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) (int, []byte) {
 	// int rc;
 	// struct timeval tv;
   
@@ -56,28 +56,39 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) ([]byte,
 	defer conn.Close()
 
 	// perform communication
-	resp, rc := multiple_attempt(
-		func ( c net.Conn, r []byte) (string, int) {
+	rc, resp:= multiple_attempt(
+		func ( c net.Conn, r []byte) (int, []byte) {
 			_, err = c.Write(r)
 			if err != nil {
-				return  "", -1
+				return  0, []byte("failed to send the request.")
 			}
 
-			resp, err := bufio.NewReader(c).ReadString('\n')
-			if err != nil {
-				return "", -1
+			resp := make([]byte, SAM_MSG_LEN)
+
+			// var n int32
+		
+			n, err1 := conn.Read(resp)
+			if err1 != nil {
+				return 0, []byte("failed to read the response.")
 			}
-		  return resp, 0;
-		},conn, req,
+			// println("resp: ", string(resp))
+			// sam := e.parse_sample(resp)
+		
+			// println("reply from server: ", string(sam), n)
+
+		  return n, resp;
+		}, conn, req,
 		NET_OP_MAX_ATTEMPT, NET_OP_RETRY_INTV)
 
-	log.Info("Resp: %s", resp)
+	log.Info("Resp: %s, Length: %d", resp, rc)
 
-	if rc == 0 {
-		sample = e.parse_response(resp)
+	if rc <= 0 {
+		log.Fatalf("Failed to communicate with alnair server daemon")
+		return rc,  []byte("")
 	}
+	rc, sample = e.parse_sample(resp)
 
-	return sample, rc
+	return rc, sample
   }
 
   func (e *Exporter) parse_response(resp []byte) []byte {
@@ -92,6 +103,33 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) ([]byte,
 	}    
 	return unpacked.sample
   }
+
+  func (e *Exporter) parse_sample(resp []byte) (int, []byte) {
+    var unpacked UnpackedSample
+
+	buf := bytes.NewReader(resp)
+
+    err := binary.Read(buf, binary.LittleEndian, &unpacked.id)
+	if err != nil {
+		log.Errorf("Unable to parse id, Error: %s", err)
+		return 0, []byte("reqid is wrong")
+	}
+
+    err = binary.Read(buf, binary.LittleEndian, &unpacked.length)
+	if err != nil {
+		log.Errorf("Unable to parse sample length, Error: %s", err)
+		return 0, []byte("response length is wrong")
+	}    
+    println("sample length: ", unpacked.length)
+    unpacked.sample = make([]byte, unpacked.length)
+    err = binary.Read(buf, binary.LittleEndian, &unpacked.sample)
+	if err != nil {
+		log.Errorf("Unable to parse sample, Error: %s", err)
+        return 0, []byte("sample contents are wrong.")
+	}    
+	return int(unpacked.length), unpacked.sample
+  }
+
 // Attempt a function several times. Non-zero return of func is treated as an error. If func return
 // -1, errno will be returned.
 
