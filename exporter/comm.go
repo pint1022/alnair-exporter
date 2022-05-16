@@ -71,7 +71,7 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) (int, []
 			if err1 != nil {
 				return 0, []byte("failed to read the response.")
 			}
-			// println("resp: ", string(resp))
+			println("resp: ", string(resp))
 			// sam := e.parse_sample(resp)
 		
 			// println("reply from server: ", string(sam), n)
