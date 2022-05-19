@@ -2,6 +2,9 @@ package exporter
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"fmt"
+
+    // "encoding/json"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -45,14 +48,25 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 
 
 
-	GPUdata, rc := e.getGPUMetrics()
-	if rc != 0 {
-		log.Errorf("Error gathering GPU metrics from remote API: %v", err)
+	// var GPUdata *GPUMetrics
+	// var rc int
+	// var podname []byte
+	// var uuid string
+
+	rc, GPUdata, podname, uuid := e.getGPUMetrics()
+	if rc <= 0 {
+		log.Errorf("Error gathering GPU metrics from remote API: ", rc)
 		return
 	}
+    // out, err := json.Marshal(GPUdata)
+    // if err != nil {
+    //     panic (err)
+    // }
+
+    fmt.Println("struct is: ", *GPUdata)
 
 	// Set prometheus gauge metrics using the data gathered
-	err = e.processGPUMetrics(GPUdata, ch)
+	err = e.processGPUMetrics(GPUdata, ch, string(podname), string(uuid))
 
 	if err != nil {
 		log.Error("Error Processing Metrics", err)

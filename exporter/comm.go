@@ -35,13 +35,8 @@ func multiple_attempt(f func(net.Conn, []byte) (int, []byte), conn net.Conn, req
 
 }
 
-func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) (int, []byte) {
-	// int rc;
-	// struct timeval tv;
-  
-	var sample []byte
+func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) (int, []byte, []byte, []byte) {
 	req := e.prepare_request(reqType)
-	// log.Info("req: %s", req)
 
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -69,26 +64,23 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) (int, []
 		
 			n, err1 := conn.Read(resp)
 			if err1 != nil {
+				log.Fatalf("Failed to read response from alnair server")
 				return 0, []byte("failed to read the response.")
 			}
-			println("resp: ", string(resp))
-			// sam := e.parse_sample(resp)
-		
-			// println("reply from server: ", string(sam), n)
 
 		  return n, resp;
 		}, conn, req,
 		NET_OP_MAX_ATTEMPT, NET_OP_RETRY_INTV)
 
-	log.Info("Resp: %s, Length: %d", resp, rc)
+	log.Info("Resp:", resp, ", length: ", rc)
 
 	if rc <= 0 {
 		log.Fatalf("Failed to communicate with alnair server daemon")
-		return rc,  []byte("")
+		return rc,  []byte(""), []byte(""), []byte("")
 	}
-	rc, sample = e.parse_sample(resp)
+	length, sample, podname, uuid := e.parse_sample(resp)
 
-	return rc, sample
+	return int(length), sample, podname, uuid
   }
 
   func (e *Exporter) parse_response(resp []byte) []byte {
@@ -104,30 +96,59 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) (int, []
 	return unpacked.sample
   }
 
-  func (e *Exporter) parse_sample(resp []byte) (int, []byte) {
+  func (e *Exporter) parse_sample(resp []byte) (int32, []byte, []byte, []byte) {
     var unpacked UnpackedSample
 
 	buf := bytes.NewReader(resp)
 
     err := binary.Read(buf, binary.LittleEndian, &unpacked.id)
 	if err != nil {
-		log.Errorf("Unable to parse id, Error: %s", err)
-		return 0, []byte("reqid is wrong")
+		log.Errorf("Unable to parse id, Error: ", err)
+		return 0, []byte("reqid is wrong"), []byte(""), []byte("")
+	}
+	var _len int32
+    err = binary.Read(buf, binary.LittleEndian, &_len)
+	if err != nil {
+		log.Errorf("Unable to parse pod name length, Error: ", err)
+		return 0, []byte("response length is wrong"), []byte(""), []byte("")
+	}    
+    podname := make([]byte, _len)
+    err = binary.Read(buf, binary.LittleEndian, &podname)
+	log.Info("podname: ", string(podname), ", len: ", _len)
+
+	if err != nil {
+		log.Errorf("Unable to parse podname, Error: ", err)
+        return 0, []byte("podname are wrong."), []byte(""), []byte("")
+	}
+    err = binary.Read(buf, binary.LittleEndian, &_len)
+	if err != nil {
+		log.Errorf("Unable to parse uuid length, Error: ", err)
+		return 0, []byte("response uuid length is wrong"), []byte(""), []byte("")
+	}    
+    uuid := make([]byte, _len)
+    err = binary.Read(buf, binary.LittleEndian, &uuid)
+	log.Info("uuid: ", string(uuid), ", len: ", _len)
+
+	if err != nil {
+		log.Errorf("Unable to parse uuid, Error: ", err)
+        return 0, []byte("uuid are wrong."), []byte(""), []byte("")
 	}
 
     err = binary.Read(buf, binary.LittleEndian, &unpacked.length)
 	if err != nil {
-		log.Errorf("Unable to parse sample length, Error: %s", err)
-		return 0, []byte("response length is wrong")
+		log.Errorf("Unable to parse sample length, Error: ", err)
+		return 0, []byte("response length is wrong"), []byte(""), []byte("")
 	}    
-    println("sample length: ", unpacked.length)
     unpacked.sample = make([]byte, unpacked.length)
+
     err = binary.Read(buf, binary.LittleEndian, &unpacked.sample)
+
 	if err != nil {
-		log.Errorf("Unable to parse sample, Error: %s", err)
-        return 0, []byte("sample contents are wrong.")
-	}    
-	return int(unpacked.length), unpacked.sample
+		log.Errorf("Unable to parse sample, Error: ", err)
+        return 0, []byte("sample contents are wrong."), []byte(""), []byte("")
+	}
+
+	return unpacked.length,  unpacked.sample, podname, uuid
   }
 
 // Attempt a function several times. Non-zero return of func is treated as an error. If func return

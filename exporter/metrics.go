@@ -117,13 +117,13 @@ func (e *Exporter) processMetrics(data []*Datum, rates *RateLimits, ch chan<- pr
 }
 
 // processGPUmetrics - processes the response GPU metrics using it as a source
-func (e *Exporter) processGPUMetrics( data *GPUMetrics, ch chan<- prometheus.Metric) error {
+func (e *Exporter) processGPUMetrics( data *GPUMetrics, ch chan<- prometheus.Metric, podname string, uuid string) error {
 
 	// Set Rate limit stats
-	ch <- prometheus.MustNewConstMetric(e.APIMetrics["BurstSize"], prometheus.GaugeValue, float64(data.burst))
-	ch <- prometheus.MustNewConstMetric(e.APIMetrics["Overuse"], prometheus.GaugeValue, float64(data.overuse))
-	ch <- prometheus.MustNewConstMetric(e.APIMetrics["MemH2D"], prometheus.GaugeValue, float64(data.MemH2D))
-	ch <- prometheus.MustNewConstMetric(e.APIMetrics["MemD2H"], prometheus.GaugeValue, float64(data.MemD2H))
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["BurstSize"], prometheus.GaugeValue, float64(data.Bs), podname, uuid)
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["Overuse"], prometheus.GaugeValue, float64(data.Ou), podname, uuid)
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["MemH2D"], prometheus.GaugeValue, float64(data.Hd), podname, uuid)
+	ch <- prometheus.MustNewConstMetric(e.APIMetrics["MemD2H"], prometheus.GaugeValue, float64(data.Dh), podname, uuid)
 
 	return nil
 }

@@ -139,20 +139,24 @@ func isArray(body []byte) bool {
 }
 
   
-func (e *Exporter) getGPUMetrics() (*GPUMetrics, int) {
+func (e *Exporter) getGPUMetrics()(int, *GPUMetrics, []byte, []byte)  {
 
 	CONNECT := e.AlnrIP() + ":" + e.AlnrPort()
-	rc, sample:= e.communicate(CONNECT, REQ_SAMPLE)
-	log.Info("Alnair server address: %s", CONNECT)
+	// log.Info("Alnair server address: ", CONNECT)
+	rc, sample, podname, uuid:= e.communicate(CONNECT, REQ_SAMPLE)
+	// log.Info("resp: ", sample, ", length: ", rc)
 
 	if rc <= 0 {
 		err := "failed to retrieve sampling data."
 		log.Errorf(err)
-		return &GPUMetrics {}, rc
+		return rc, &GPUMetrics{}, []byte(""), []byte("")
 	}
-	
-	data := GPUMetrics {}
-	json.Unmarshal(sample, &data)
+	println("Sample: ", string(sample), rc)
+    // Data1 := []byte(`{"Ts": 1234567890, "Bs": 100, "Ou": 200, "Ws": 300, "Hd": 400, "Dh": 500}`)
 
-	return &data, rc
+	var data GPUMetrics
+	json.Unmarshal(sample, &data)
+    fmt.Println("Struct is:", data)
+
+	return rc, &data, podname, uuid
 }
