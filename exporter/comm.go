@@ -46,7 +46,7 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) (int, []
 
 	conn, err := d.DialContext(ctx, "tcp", CONNECT)
 	if err != nil {
-		log.Fatalf("Failed to dial: %v", err)
+		log.Fatalf("Failed to dial: %v, %s", err, CONNECT)
 	}
 	defer conn.Close()
 
@@ -64,7 +64,7 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) (int, []
 		
 			n, err1 := conn.Read(resp)
 			if err1 != nil {
-				log.Fatalf("Failed to read response from alnair server")
+				log.Info("Failed to read response from alnair server")
 				return 0, []byte("failed to read the response.")
 			}
 
@@ -72,7 +72,7 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) (int, []
 		}, conn, req,
 		NET_OP_MAX_ATTEMPT, NET_OP_RETRY_INTV)
 
-	log.Info("Resp:", resp, ", length: ", rc)
+	// log.Info("Resp:", resp, ", length: ", rc)
 
 	if rc <= 0 {
 		log.Fatalf("Failed to communicate with alnair server daemon")
@@ -114,7 +114,7 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) (int, []
 	}    
     podname := make([]byte, _len)
     err = binary.Read(buf, binary.LittleEndian, &podname)
-	log.Info("podname: ", string(podname), ", len: ", _len)
+	// log.Info("podname: ", string(podname), ", len: ", _len)
 
 	if err != nil {
 		log.Errorf("Unable to parse podname, Error: ", err)
@@ -127,7 +127,7 @@ func (e *Exporter) communicate(CONNECT string, reqType comm_request_t ) (int, []
 	}    
     uuid := make([]byte, _len)
     err = binary.Read(buf, binary.LittleEndian, &uuid)
-	log.Info("uuid: ", string(uuid), ", len: ", _len)
+	// log.Info("uuid: ", string(uuid), ", len: ", _len)
 
 	if err != nil {
 		log.Errorf("Unable to parse uuid, Error: ", err)

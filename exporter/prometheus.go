@@ -2,7 +2,6 @@ package exporter
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
-	"fmt"
 
     // "encoding/json"
 	log "github.com/sirupsen/logrus"
@@ -21,32 +20,8 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 // This function is called when a scrape is peformed on the /metrics page
 func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 
-	data := []*Datum{}
+	// data := []*Datum{}
 	var err error
-	// Scrape the Data from Github
-	if len(e.TargetURLs()) > 0 {
-		data, err = e.gatherData()
-		if err != nil {
-			log.Errorf("Error gathering Data from remote API: %v", err)
-			return
-		}
-	}
-
-	rates, err := e.getRates()
-	if err != nil {
-		log.Errorf("Error gathering Rates from remote API: %v", err)
-		return
-	}
-
-	// Set prometheus gauge metrics using the data gathered
-	err = e.processMetrics(data, rates, ch)
-
-	if err != nil {
-		log.Error("Error Processing Metrics", err)
-		return
-	}
-
-
 
 	// var GPUdata *GPUMetrics
 	// var rc int
@@ -63,7 +38,7 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
     //     panic (err)
     // }
 
-    fmt.Println("struct is: ", *GPUdata)
+    // fmt.Println("struct is: ", *GPUdata)
 
 	// Set prometheus gauge metrics using the data gathered
 	err = e.processGPUMetrics(GPUdata, ch, string(podname), string(uuid))
