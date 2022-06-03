@@ -1,3 +1,18 @@
+/**
+ * Copyright 2022 Steven Wang, Futurewei Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package exporter
 
 import (
@@ -16,44 +31,6 @@ type Exporter struct {
 	config.Config
 	mu sync.Mutex
 
-}
-
-// Data is used to store an array of Datums.
-// This is useful for the JSON array detection
-type Data []Datum
-
-// Datum is used to store data from all the relevant endpoints in the API
-type Datum struct {
-	Name  string `json:"name"`
-	Owner struct {
-		Login string `json:"login"`
-	} `json:"owner"`
-	License struct {
-		Key string `json:"key"`
-	} `json:"license"`
-	Language   string  `json:"language"`
-	Archived   bool    `json:"archived"`
-	Private    bool    `json:"private"`
-	Fork       bool    `json:"fork"`
-	Forks      float64 `json:"forks"`
-	Stars      float64 `json:"stargazers_count"`
-	OpenIssues float64 `json:"open_issues"`
-	Watchers   float64 `json:"subscribers_count"`
-	Size       float64 `json:"size"`
-	Releases   []Release
-	Pulls      []Pull
-}
-
-type Release struct {
-	Name   string  `json:"name"`
-	Assets []Asset `json:"assets"`
-}
-
-type Pull struct {
-	Url  string `json:"url"`
-	User struct {
-		Login string `json:"login"`
-	} `json:"user"`
 }
 
 type Asset struct {
@@ -88,6 +65,9 @@ type GPUMetrics struct {
 	Ws 		int32
 	Hd    	int32
 	Dh    	int32
+	Rm      int32
+	Um      int32
+	Mm      int32
 }
 type comm_request_t int32
 
@@ -99,7 +79,7 @@ const (
    SAM_MSG_LEN = 128
    POD_NAME_LEN = 4
    UUID_LEN = 4
-   
+   END_READ = "NONE"
 ) 
 
 type UnpackedSample struct {
