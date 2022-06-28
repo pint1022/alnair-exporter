@@ -59,15 +59,15 @@ type Response struct {
 // RateLimits is used to store rate limit data into a struct
 // This data is later represented as a metric, captured at the end of a scrape
 type GPUMetrics struct {
-	Ts      int64
-	Bs    	int32
-	Ou   	int32
-	Ws 		int32
-	Hd    	int32
-	Dh    	int32
-	Rm      int32
-	Um      int32
-	Mm      int32
+	Ts      int64   // time stamp
+	Bs    	int32   // Burst size
+	Ou   	int32   // Over use
+	Ws 		int32   // Window size
+	Hd    	int32   // Host2Device duration 
+	Dh    	int32   // Device2Host duration
+	Rm      int32   // Remain quota
+	Um      int32   // Used memory
+	Mm      int32   // Memory limit
 }
 type comm_request_t int32
 
