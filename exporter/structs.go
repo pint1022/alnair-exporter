@@ -76,7 +76,7 @@ const (
    REQ_MEM_LIMIT = 1
    REQ_MEM_UPDATE = 2
    REQ_SAMPLE = 3
-   SAM_MSG_LEN = 128
+   SAM_MSG_LEN = 148
    POD_NAME_LEN = 4
    UUID_LEN = 4
    END_READ = "NONE"
